@@ -107,6 +107,21 @@
     font-family: var(--font-display);
     letter-spacing: -0.02em;
   }
+  /* Tailwind v4 dropped the pointer cursor on buttons; restore it for everything clickable. */
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  [role="option"],
+  [role="menuitem"],
+  a[href],
+  summary,
+  label[for],
+  select {
+    cursor: pointer;
+  }
+  button:disabled,
+  [aria-disabled="true"] {
+    cursor: not-allowed;
+  }
   :focus-visible {
     outline: 2px solid var(--ring);
     outline-offset: 2px;

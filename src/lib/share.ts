@@ -1,3 +1,5 @@
+import { DISTRICTS } from "@/data/districts";
+import type { Lang } from "@/lib/i18n";
 import { COUNTS, DIFFICULTIES, MODES, type Difficulty, type Mode } from "@/lib/quiz";
 
 /** Everything a shared result or challenge link carries. Lives in the URL — no backend. */
@@ -7,10 +9,25 @@ export type Challenge = {
   score: number;
   total: number;
   streak: number;
+  /** District ids answered correctly / incorrectly, drawn on the share image's map. */
+  hits: string[];
+  misses: string[];
+  lang: Lang;
 };
 
 export const accuracy = (c: Pick<Challenge, "score" | "total">) =>
   c.total ? Math.round((c.score / c.total) * 100) : 0;
+
+// One URL-safe character per district: its index in DISTRICTS.
+const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+const encodeIds = (ids: string[]) =>
+  ids.map((id) => ALPHABET[DISTRICTS.findIndex((d) => d.id === id)] ?? "").join("");
+const decodeIds = (v: unknown, max: number) =>
+  typeof v === "string"
+    ? [...new Set([...v].map((ch) => DISTRICTS[ALPHABET.indexOf(ch)]?.id).filter(Boolean))]
+        .slice(0, max)
+        .map(String)
+    : [];
 
 const int = (v: unknown) => {
   const n = typeof v === "number" ? v : typeof v === "string" ? Number(v) : NaN;
@@ -27,13 +44,13 @@ export function parseChallenge(s: Record<string, unknown>): Challenge | undefine
     ? (s.difficulty as Difficulty)
     : "medium";
   const streak = Math.min(total, Math.max(0, int(s.streak) ?? 0));
-  return { mode, difficulty, score, total, streak };
+  const hits = decodeIds(s.c, total);
+  const misses = decodeIds(s.w, total).filter((id) => !hits.includes(id));
+  const lang: Lang = s.l === "en" ? "en" : "bn";
+  return { mode, difficulty, score, total, streak, hits, misses, lang };
 }
 
-export function challengeUrl(
-  c: Challenge,
-  origin = typeof window !== "undefined" ? window.location.origin : "",
-) {
+function challengeParams(c: Challenge) {
   const q = new URLSearchParams({
     mode: c.mode,
     difficulty: c.difficulty,
@@ -41,8 +58,20 @@ export function challengeUrl(
     total: String(c.total),
     streak: String(c.streak),
   });
-  return `${origin}/challenge?${q}`;
+  if (c.hits.length) q.set("c", encodeIds(c.hits));
+  if (c.misses.length) q.set("w", encodeIds(c.misses));
+  if (c.lang !== "bn") q.set("l", c.lang);
+  return q;
 }
+
+const currentOrigin = () => (typeof window !== "undefined" ? window.location.origin : "");
+
+export const challengeUrl = (c: Challenge, origin = currentOrigin()) =>
+  `${origin}/challenge?${challengeParams(c)}`;
+
+/** Link-preview image for a challenge, rendered by /api/og. */
+export const ogImageUrl = (c: Challenge, origin = currentOrigin()) =>
+  `${origin}/api/og?${challengeParams(c)}`;
 
 /** Plain share-intent URLs — no SDKs or API keys. */
 export function shareLinks(url: string, text: string) {

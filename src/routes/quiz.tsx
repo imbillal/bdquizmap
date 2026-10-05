@@ -27,12 +27,20 @@ import { useLang } from "@/lib/i18n";
 import { type Challenge } from "@/lib/share";
 import { cn } from "@/lib/utils";
 
-type Search = { mode?: Mode; difficulty?: Difficulty; count?: number; district?: string; start?: boolean };
+type Search = {
+  mode?: Mode;
+  difficulty?: Difficulty;
+  count?: number;
+  district?: string;
+  start?: boolean;
+};
 
 export const Route = createFileRoute("/quiz")({
   validateSearch: (s: Record<string, unknown>): Search => ({
     mode: MODES.some((m) => m.id === s.mode) ? (s.mode as Mode) : undefined,
-    difficulty: DIFFICULTIES.includes(s.difficulty as Difficulty) ? (s.difficulty as Difficulty) : undefined,
+    difficulty: DIFFICULTIES.includes(s.difficulty as Difficulty)
+      ? (s.difficulty as Difficulty)
+      : undefined,
     count: typeof s.count === "number" ? s.count : undefined,
     district: typeof s.district === "string" ? s.district : undefined,
     start: s.start === true || s.start === "true" ? true : undefined,
@@ -40,7 +48,11 @@ export const Route = createFileRoute("/quiz")({
   head: () => ({
     meta: [
       { title: "কুইজ খেলুন — বাংলাদেশ কুইজ ম্যাপ" },
-      { name: "description", content: "বাংলাদেশের ম্যাপে জেলা চিনুন, বিভাগ বলুন, অথবা জায়গা খুঁজে বের করুন। নিজের সেরা স্কোর ভাঙুন।" },
+      {
+        name: "description",
+        content:
+          "বাংলাদেশের ম্যাপে জেলা চিনুন, বিভাগ বলুন, অথবা জায়গা খুঁজে বের করুন। নিজের সেরা স্কোর ভাঙুন।",
+      },
       { property: "og:title", content: "বাংলাদেশ কুইজ ম্যাপ খেলুন" },
       { property: "og:description", content: "বাংলাদেশের ৬৪টি জেলা কি আপনি চিনতে পারবেন?" },
       { property: "og:type", content: "website" },
@@ -56,7 +68,11 @@ type Result = { score: number; answers: Answer[]; bestStreak: number; settings: 
 function QuizPage() {
   const search = Route.useSearch();
   const navigate = useNavigate({ from: "/quiz" });
-  const [settings, setSettings] = useState<Settings>({ mode: "district", difficulty: "medium", count: 10 });
+  const [settings, setSettings] = useState<Settings>({
+    mode: "district",
+    difficulty: "medium",
+    count: 10,
+  });
   const [phase, setPhase] = useState<"setup" | "play" | "results">("setup");
   const [round, setRound] = useState<Question[]>([]);
   const [result, setResult] = useState<Result | null>(null);
@@ -91,19 +107,32 @@ function QuizPage() {
     const next = { ...settings, ...patch };
     setSettings(next);
     saveSettings(next);
-    navigate({ search: { mode: next.mode, difficulty: next.difficulty, count: next.count }, replace: true });
+    navigate({
+      search: { mode: next.mode, difficulty: next.difficulty, count: next.count },
+      replace: true,
+    });
   };
 
   return (
     <div className="py-6">
       <AnimatePresence mode="wait">
         {phase === "setup" && (
-          <motion.div key="setup" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
+          <motion.div
+            key="setup"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+          >
             <Setup settings={settings} update={update} onStart={() => begin(settings)} />
           </motion.div>
         )}
         {phase === "play" && round.length > 0 && (
-          <motion.div key="play" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+          <motion.div
+            key="play"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
             <Game
               key={round.map((q) => q.district.id).join()}
               round={round}
@@ -118,7 +147,11 @@ function QuizPage() {
         )}
         {phase === "results" && result && (
           <motion.div key="results" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-            <Results result={result} onAgain={() => begin(settings)} onSetup={() => setPhase("setup")} />
+            <Results
+              result={result}
+              onAgain={() => begin(settings)}
+              onSetup={() => setPhase("setup")}
+            />
           </motion.div>
         )}
       </AnimatePresence>
@@ -143,7 +176,9 @@ function Segmented<T extends string | number>({
 }) {
   return (
     <fieldset>
-      <legend className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">{label}</legend>
+      <legend className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+        {label}
+      </legend>
       <div className="flex gap-2">
         {options.map((o) => (
           <button
@@ -152,7 +187,9 @@ function Segmented<T extends string | number>({
             onClick={() => onChange(o)}
             className={cn(
               "flex-1 rounded-lg border px-3 py-2.5 text-sm font-semibold capitalize transition",
-              value === o ? "border-accent bg-accent text-accent-foreground" : "bg-secondary hover:bg-muted",
+              value === o
+                ? "border-accent bg-accent text-accent-foreground"
+                : "bg-secondary hover:bg-muted",
             )}
           >
             {render ? render(o) : o}
@@ -179,7 +216,9 @@ function Setup({
       <p className="mt-1 text-sm text-muted-foreground">{t.setupSub}</p>
 
       <fieldset className="mt-6">
-        <legend className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t.quizMode}</legend>
+        <legend className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+          {t.quizMode}
+        </legend>
         <div className="grid gap-2 sm:grid-cols-3">
           {MODES.map((m) => (
             <button
@@ -188,11 +227,20 @@ function Setup({
               onClick={() => update({ mode: m.id })}
               className={cn(
                 "rounded-xl border p-3 text-left transition",
-                settings.mode === m.id ? "border-accent bg-accent text-accent-foreground" : "bg-secondary hover:bg-muted",
+                settings.mode === m.id
+                  ? "border-accent bg-accent text-accent-foreground"
+                  : "bg-secondary hover:bg-muted",
               )}
             >
               <div className="text-sm font-bold">{t.modes[m.id].label}</div>
-              <div className={cn("text-xs", settings.mode === m.id ? "opacity-80" : "text-muted-foreground")}>{t.modes[m.id].hint}</div>
+              <div
+                className={cn(
+                  "text-xs",
+                  settings.mode === m.id ? "opacity-80" : "text-muted-foreground",
+                )}
+              >
+                {t.modes[m.id].hint}
+              </div>
             </button>
           ))}
         </div>
@@ -312,14 +360,19 @@ function Game({
     const correct = picked === q.answer;
     s[id] = "correct";
     if (!correct && picked) {
-      const wrong = isFind ? byId.get(picked) : q.mode === "district" ? DISTRICTS.find((d) => d.name === picked) : undefined;
+      const wrong = isFind
+        ? byId.get(picked)
+        : q.mode === "district"
+          ? DISTRICTS.find((d) => d.name === picked)
+          : undefined;
       if (wrong) s[wrong.id] = "incorrect";
     }
     return s;
   }, [q, revealed, picked, isFind]);
 
   const correct = revealed && picked === q.answer;
-  const prompt = q.mode === "district" ? t.promptDistrict : q.mode === "division" ? t.promptDivision : null;
+  const prompt =
+    q.mode === "district" ? t.promptDistrict : q.mode === "division" ? t.promptDivision : null;
   const choiceLabel = (c: string) => (q.mode === "division" ? division(c) : district(c));
   const name = district(q.district.name);
   const urgent = timeLeft <= 5 && !revealed;
@@ -330,14 +383,20 @@ function Game({
       <div className="mb-4 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
         <div className="min-w-0">
           <div className="flex items-center gap-3 text-sm">
-            <span className="font-semibold">
-              {t.questionOf(idx + 1, round.length)}
-            </span>
-            <button onClick={onQuit} className="text-xs text-muted-foreground underline-offset-2 hover:underline">
+            <span className="font-semibold">{t.questionOf(idx + 1, round.length)}</span>
+            <button
+              onClick={onQuit}
+              className="text-xs text-muted-foreground underline-offset-2 hover:underline"
+            >
               {t.quit}
             </button>
           </div>
-          <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-secondary" role="progressbar" aria-valuenow={idx + (revealed ? 1 : 0)} aria-valuemax={round.length}>
+          <div
+            className="mt-2 h-1.5 overflow-hidden rounded-full bg-secondary"
+            role="progressbar"
+            aria-valuenow={idx + (revealed ? 1 : 0)}
+            aria-valuemax={round.length}
+          >
             <motion.div
               className="h-full rounded-full bg-accent"
               animate={{ width: `${((idx + (revealed ? 1 : 0)) / round.length) * 100}%` }}
@@ -350,12 +409,18 @@ function Game({
             key={streak}
             initial={{ scale: streak > 0 ? 1.25 : 1 }}
             animate={{ scale: 1 }}
-            className={cn("flex items-center gap-1 rounded-lg border px-2.5 py-1.5 text-sm font-bold", streak > 0 ? "text-ember" : "text-muted-foreground")}
+            className={cn(
+              "flex items-center gap-1 rounded-lg border px-2.5 py-1.5 text-sm font-bold",
+              streak > 0 ? "text-ember" : "text-muted-foreground",
+            )}
             aria-label={t.streakAria(streak)}
           >
             <Flame className="size-4" /> {t.num(streak)}
           </motion.div>
-          <div className="relative rounded-lg border bg-card px-3 py-1.5 font-display text-lg font-bold tabular-nums" aria-label={t.scoreAria(score)}>
+          <div
+            className="relative rounded-lg border bg-card px-3 py-1.5 font-display text-lg font-bold tabular-nums"
+            aria-label={t.scoreAria(score)}
+          >
             {t.num(score)}
             <AnimatePresence>
               {gain && (
@@ -407,7 +472,11 @@ function Game({
                 aria-label={t.secondsLeft(timeLeft)}
               >
                 <Timer className="size-4" />
-                <motion.span key={timeLeft} initial={urgent ? { scale: 1.2 } : false} animate={{ scale: 1 }}>
+                <motion.span
+                  key={timeLeft}
+                  initial={urgent ? { scale: 1.2 } : false}
+                  animate={{ scale: 1 }}
+                >
                   {t.num(timeLeft)}
                 </motion.span>
               </div>
@@ -435,13 +504,20 @@ function Game({
                       "flex min-h-14 items-center justify-between gap-2 rounded-xl border px-4 py-3 text-left font-semibold transition",
                       !revealed && "bg-secondary hover:border-accent hover:bg-muted",
                       revealed && isAns && "border-success bg-success text-success-foreground",
-                      revealed && isPicked && !isAns && "border-destructive bg-destructive text-destructive-foreground",
+                      revealed &&
+                        isPicked &&
+                        !isAns &&
+                        "border-destructive bg-destructive text-destructive-foreground",
                       revealed && !isAns && !isPicked && "opacity-50",
                     )}
                   >
                     <span>{choiceLabel(c)}</span>
-                    {revealed && isAns && <Check className="size-4 shrink-0" aria-label={t.correctAnswer} />}
-                    {revealed && isPicked && !isAns && <X className="size-4 shrink-0" aria-label={t.yourAnswer} />}
+                    {revealed && isAns && (
+                      <Check className="size-4 shrink-0" aria-label={t.correctAnswer} />
+                    )}
+                    {revealed && isPicked && !isAns && (
+                      <X className="size-4 shrink-0" aria-label={t.yourAnswer} />
+                    )}
                   </motion.button>
                 );
               })}
@@ -456,7 +532,12 @@ function Game({
                 className="rounded-2xl border bg-card p-5"
                 role="status"
               >
-                <p className={cn("flex items-center gap-2 text-lg font-bold", correct ? "text-success" : "text-destructive")}>
+                <p
+                  className={cn(
+                    "flex items-center gap-2 text-lg font-bold",
+                    correct ? "text-success" : "text-destructive",
+                  )}
+                >
                   {correct ? <Check className="size-5" /> : <X className="size-5" />}
                   {correct ? t.correct : picked === null ? t.timeUp : t.notQuite}
                 </p>
@@ -464,10 +545,15 @@ function Game({
                   {correct || q.mode === "division"
                     ? t.inDivision(name, division(q.district.division))
                     : isFind
-                      ? t.wrongFind(picked ? district(byId.get(picked)?.name ?? "") : undefined, name)
+                      ? t.wrongFind(
+                          picked ? district(byId.get(picked)?.name ?? "") : undefined,
+                          name,
+                        )
                       : t.highlightedIs(name)}
                 </p>
-                {streakEnded && <p className="mt-2 text-xs text-muted-foreground">{t.streakEnded}</p>}
+                {streakEnded && (
+                  <p className="mt-2 text-xs text-muted-foreground">{t.streakEnded}</p>
+                )}
                 {correct && streak >= 2 && (
                   <p className="mt-2 flex items-center gap-1 text-sm font-semibold text-ember">
                     <Flame className="size-4" /> {t.streakN(streak)}
@@ -478,7 +564,8 @@ function Game({
                   onClick={next}
                   className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 font-semibold text-primary-foreground hover:opacity-90"
                 >
-                  {idx + 1 >= round.length ? t.seeResults : t.nextQuestion} <ArrowRight className="size-4" />
+                  {idx + 1 >= round.length ? t.seeResults : t.nextQuestion}{" "}
+                  <ArrowRight className="size-4" />
                 </button>
               </motion.div>
             )}
@@ -491,18 +578,28 @@ function Game({
 
 /* ---------------- Results ---------------- */
 
-function Results({ result, onAgain, onSetup }: { result: Result; onAgain: () => void; onSetup: () => void }) {
+function Results({
+  result,
+  onAgain,
+  onSetup,
+}: {
+  result: Result;
+  onAgain: () => void;
+  onSetup: () => void;
+}) {
   const total = result.answers.length;
   const correct = result.answers.filter((a) => a.correct).length;
   const pct = total ? Math.round((correct / total) * 100) : 0;
   const [newBest, setNewBest] = useState(false);
   const saved = useRef(false);
-  const { t } = useLang();
+  const { t, lang } = useLang();
 
   useEffect(() => {
     if (saved.current) return;
     saved.current = true;
-    setNewBest(recordGame({ score: result.score, correct, total, bestStreak: result.bestStreak }).newBest);
+    setNewBest(
+      recordGame({ score: result.score, correct, total, bestStreak: result.bestStreak }).newBest,
+    );
   }, [result, correct, total]);
 
   const states = useMemo(() => {
@@ -511,17 +608,32 @@ function Results({ result, onAgain, onSetup }: { result: Result; onAgain: () => 
     return s;
   }, [result]);
   const shared = useMemo<Challenge>(
-    () => ({ ...result.settings, score: correct, total, streak: result.bestStreak }),
-    [result, correct, total],
+    () => ({
+      ...result.settings,
+      score: correct,
+      total,
+      streak: result.bestStreak,
+      hits: result.answers.filter((a) => a.correct).map((a) => a.id),
+      misses: result.answers.filter((a) => !a.correct).map((a) => a.id),
+      lang,
+    }),
+    [result, correct, total, lang],
   );
 
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_1fr]">
       <div className="rounded-3xl border bg-card p-8 text-center shadow-card">
-        <motion.div initial={{ scale: 0.6, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="text-5xl" aria-hidden>
+        <motion.div
+          initial={{ scale: 0.6, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          className="text-5xl"
+          aria-hidden
+        >
           🎉
         </motion.div>
-        <p className="mt-3 text-xs font-bold uppercase tracking-[0.3em] text-muted-foreground">{t.quizComplete}</p>
+        <p className="mt-3 text-xs font-bold uppercase tracking-[0.3em] text-muted-foreground">
+          {t.quizComplete}
+        </p>
         <p className="mt-1 text-sm text-muted-foreground">
           {t.modes[result.settings.mode].label} · {t.difficulties[result.settings.difficulty]}
         </p>
@@ -533,13 +645,20 @@ function Results({ result, onAgain, onSetup }: { result: Result; onAgain: () => 
         >
           {t.num(result.score)}
         </motion.p>
-        <p className="text-xs font-bold uppercase tracking-[0.3em] text-muted-foreground">{t.points}</p>
+        <p className="text-xs font-bold uppercase tracking-[0.3em] text-muted-foreground">
+          {t.points}
+        </p>
         {newBest && (
           <p className="mx-auto mt-3 flex w-fit items-center gap-1 rounded-full bg-accent px-3 py-1 text-xs font-bold text-accent-foreground">
             <Trophy className="size-3.5" /> {t.newBest}
           </p>
         )}
-        <motion.h2 initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="mt-6 text-2xl font-bold text-accent">
+        <motion.h2
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          className="mt-6 text-2xl font-bold text-accent"
+        >
           {t.rating(pct)}
         </motion.h2>
         <dl className="mt-6 grid grid-cols-3 gap-2">
@@ -565,8 +684,12 @@ function Results({ result, onAgain, onSetup }: { result: Result; onAgain: () => 
           <RotateCcw className="size-4" /> {t.playAgain}
         </button>
         <div className="mt-4 flex justify-center gap-4 text-sm text-muted-foreground">
-          <button onClick={onSetup} className="hover:text-foreground">{t.changeSettings}</button>
-          <Link to="/explore" className="hover:text-foreground">{t.exploreDistrictsLink}</Link>
+          <button onClick={onSetup} className="hover:text-foreground">
+            {t.changeSettings}
+          </button>
+          <Link to="/explore" className="hover:text-foreground">
+            {t.exploreDistrictsLink}
+          </Link>
         </div>
       </div>
 

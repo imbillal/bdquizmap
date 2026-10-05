@@ -2,7 +2,16 @@ import { describe, expect, it } from "vitest";
 import { STRINGS } from "@/lib/i18n";
 import { accuracy, challengeUrl, parseChallenge, shareLinks, type Challenge } from "@/lib/share";
 
-const c: Challenge = { mode: "district", difficulty: "hard", score: 8, total: 10, streak: 5 };
+const c: Challenge = {
+  mode: "district",
+  difficulty: "hard",
+  score: 2,
+  total: 5,
+  streak: 2,
+  hits: ["dhaka", "sylhet"],
+  misses: ["khulna", "bhola", "feni"],
+  lang: "en",
+};
 
 describe("share", () => {
   it("round-trips a challenge through the URL", () => {
@@ -18,6 +27,9 @@ describe("share", () => {
       score: 3,
       total: 5,
       streak: 0,
+      hits: [],
+      misses: [],
+      lang: "bn",
     });
   });
 
@@ -28,9 +40,9 @@ describe("share", () => {
   });
 
   it("builds share-intent links with the message", () => {
-    expect(accuracy(c)).toBe(80);
+    expect(accuracy(c)).toBe(40);
     const msg = STRINGS.bn.shareMessage(accuracy(c));
-    expect(msg).toBe("বাংলাদেশ কুইজে আমি ৮০% পেয়েছি 🇧🇩 আমাকে হারাতে পারবেন?");
+    expect(msg).toBe("বাংলাদেশ কুইজে আমি ৪০% পেয়েছি 🇧🇩 আমাকে হারাতে পারবেন?");
     const links = shareLinks("https://example.com/challenge?x=1", msg);
     expect(decodeURIComponent(links.x)).toContain(msg);
     expect(links.facebook).toContain(encodeURIComponent("https://example.com/challenge?x=1"));

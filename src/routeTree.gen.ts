@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ChallengeRouteImport } from './routes/challenge'
 import { Route as ExploreRouteImport } from './routes/explore'
 import { Route as QuizRouteImport } from './routes/quiz'
+import { Route as ApiOgRouteImport } from './routes/api/og'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -34,18 +35,25 @@ const QuizRoute = QuizRouteImport.update({
   path: '/quiz',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiOgRoute = ApiOgRouteImport.update({
+  id: '/api/og',
+  path: '/api/og',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/challenge': typeof ChallengeRoute
   '/explore': typeof ExploreRoute
   '/quiz': typeof QuizRoute
+  '/api/og': typeof ApiOgRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/challenge': typeof ChallengeRoute
   '/explore': typeof ExploreRoute
   '/quiz': typeof QuizRoute
+  '/api/og': typeof ApiOgRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -53,13 +61,14 @@ export interface FileRoutesById {
   '/challenge': typeof ChallengeRoute
   '/explore': typeof ExploreRoute
   '/quiz': typeof QuizRoute
+  '/api/og': typeof ApiOgRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/challenge' | '/explore' | '/quiz'
+  fullPaths: '/' | '/challenge' | '/explore' | '/quiz' | '/api/og'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/challenge' | '/explore' | '/quiz'
-  id: '__root__' | '/' | '/challenge' | '/explore' | '/quiz'
+  to: '/' | '/challenge' | '/explore' | '/quiz' | '/api/og'
+  id: '__root__' | '/' | '/challenge' | '/explore' | '/quiz' | '/api/og'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -67,6 +76,7 @@ export interface RootRouteChildren {
   ChallengeRoute: typeof ChallengeRoute
   ExploreRoute: typeof ExploreRoute
   QuizRoute: typeof QuizRoute
+  ApiOgRoute: typeof ApiOgRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -99,6 +109,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof QuizRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/og': {
+      id: '/api/og'
+      path: '/api/og'
+      fullPath: '/api/og'
+      preLoaderRoute: typeof ApiOgRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -107,6 +124,7 @@ const rootRouteChildren: RootRouteChildren = {
   ChallengeRoute: ChallengeRoute,
   ExploreRoute: ExploreRoute,
   QuizRoute: QuizRoute,
+  ApiOgRoute: ApiOgRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

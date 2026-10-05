@@ -1,16 +1,26 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { createIsomorphicFn } from "@tanstack/react-start";
+import { getRequestUrl } from "@tanstack/react-start/server";
 import { ArrowRight, Flame, Swords } from "lucide-react";
 import { STRINGS, useLang } from "@/lib/i18n";
-import { accuracy, parseChallenge, type Challenge } from "@/lib/share";
+import { accuracy, ogImageUrl, parseChallenge } from "@/lib/share";
+
+// Crawlers need an absolute og:image URL, so resolve the site origin on the server too.
+const getOrigin = createIsomorphicFn()
+  .server(() => getRequestUrl({ xForwardedHost: true }).origin)
+  .client(() => window.location.origin);
 
 export const Route = createFileRoute("/challenge")({
   // The whole challenge lives in the URL, so no backend or database is needed.
-  validateSearch: (s: Record<string, unknown>): Partial<Challenge> => parseChallenge(s) ?? {},
-  head: ({ match }) => {
+  // Keep the raw params; parseChallenge validates them wherever they're read.
+  validateSearch: (s: Record<string, unknown>) => s,
+  loader: () => ({ origin: getOrigin() }),
+  head: ({ match, loaderData }) => {
     const c = parseChallenge(match.search);
-    const t = STRINGS.bn;
+    const t = STRINGS[c?.lang ?? "bn"];
     const title = c ? t.scoreMessage(c.score, c.total, accuracy(c)) : t.siteName;
-    const description = "বাংলাদেশকে আপনি কতটা চেনেন? ৬৪টি জেলার ম্যাপ কুইজ।";
+    const description = t.tagline;
+    const image = c && loaderData ? ogImageUrl(c, loaderData.origin) : undefined;
     return {
       meta: [
         { title: `${title} — ${t.siteName}` },
@@ -18,8 +28,18 @@ export const Route = createFileRoute("/challenge")({
         { property: "og:title", content: title },
         { property: "og:description", content: description },
         { property: "og:type", content: "website" },
+        { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:title", content: title },
         { name: "twitter:description", content: description },
+        ...(image
+          ? [
+              { property: "og:image", content: image },
+              { property: "og:image:width", content: "1200" },
+              { property: "og:image:height", content: "630" },
+              { property: "og:image:type", content: "image/png" },
+              { name: "twitter:image", content: image },
+            ]
+          : []),
       ],
     };
   },

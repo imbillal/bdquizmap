@@ -1,9 +1,10 @@
 import { forwardRef, useEffect, useRef, useState } from "react";
-import { Download, Loader2 } from "lucide-react";
+import { Download, Link2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { BangladeshMap, type DistrictState } from "@/components/BangladeshMap";
 import { useLang } from "@/lib/i18n";
-import { accuracy, type Challenge } from "@/lib/share";
+import { copyText } from "@/components/ShareButtons";
+import { accuracy, challengeUrl, type Challenge } from "@/lib/share";
 
 export const CARD_WIDTH = 1080;
 export const CARD_HEIGHT = 1350;
@@ -70,6 +71,9 @@ export const ResultCard = forwardRef<HTMLDivElement, CardProps>(function ResultC
 
 type Format = "png" | "jpeg";
 
+const smallBtn =
+  "inline-flex min-h-10 items-center justify-center gap-1.5 rounded-lg border bg-secondary px-2 py-2 text-xs font-semibold whitespace-nowrap hover:bg-muted disabled:opacity-60 sm:text-sm";
+
 /** Scaled-down live preview of the card plus client-side PNG/JPEG downloads. */
 export function ResultCardPreview(props: CardProps) {
   const { t } = useLang();
@@ -135,20 +139,21 @@ export function ResultCardPreview(props: CardProps) {
           <ResultCard ref={card} {...props} />
         </div>
       </div>
-      <div className="mt-4 grid grid-cols-2 gap-2">
+      <div className="mt-3 grid grid-cols-3 gap-2">
+        <button
+          onClick={() => copyText(challengeUrl(props.result), t.linkCopied, t.copyFailed)}
+          className={smallBtn}
+        >
+          <Link2 className="size-3.5 shrink-0" /> {t.copyLink}
+        </button>
         {(["png", "jpeg"] as const).map((f) => (
-          <button
-            key={f}
-            onClick={() => download(f)}
-            disabled={busy !== null}
-            className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg border bg-secondary px-4 py-3 font-semibold hover:bg-muted disabled:opacity-60"
-          >
+          <button key={f} onClick={() => download(f)} disabled={busy !== null} className={smallBtn}>
             {busy === f ? (
-              <Loader2 className="size-4 animate-spin" />
+              <Loader2 className="size-3.5 shrink-0 animate-spin" />
             ) : (
-              <Download className="size-4" />
+              <Download className="size-3.5 shrink-0" />
             )}
-            {t.download(f.toUpperCase())}
+            {f.toUpperCase()}
           </button>
         ))}
       </div>

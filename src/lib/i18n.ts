@@ -191,20 +191,15 @@ const en = {
   linkCopied: "Result link copied!",
   copyFailed: "Couldn't copy — try selecting the link instead",
   fbCopied: "Message copied — paste it into your post",
-  challengeFriend: "Challenge a Friend",
-  challengeCopied: "Challenge copied — send it to a friend!",
   shareMessage: (pct: number) => `I scored ${pct}% on the Bangladesh Quiz 🇧🇩 Can you beat me?`,
   scoreMessage: (s: number, t: number, pct: number) =>
     `I scored ${s}/${t} (${pct}%) on the Bangladesh Quiz 🇧🇩 Can you beat me?`,
-  challengeMessage: (s: number, t: number) =>
-    `I scored ${s}/${t} on the Bangladesh Quiz 🇧🇩 Think you can beat me?`,
 
   // Result card
   cardHeadline: ["How well do you know", "Bangladesh?"] as readonly [string, string],
   accuracyN: (pct: number) => `${pct}% accuracy`,
   streakLabel: (n: number) => `${n} streak`,
   canYouBeat: "Can you beat my score?",
-  download: (f: string) => `Download ${f}`,
   imageFailed: "Couldn't create the image — try again",
   resultMapAria: "Result map",
 
@@ -323,23 +318,18 @@ const bn: typeof en = {
           : "বাংলাদেশকে চেনার সময় এখন",
 
   shareYourResult: "আপনার ফলাফল শেয়ার করুন",
-  copyLink: "লিংক কপি করুন",
+  copyLink: "লিংক কপি",
   linkCopied: "ফলাফলের লিংক কপি হয়েছে!",
   copyFailed: "কপি করা যায়নি — লিংকটি সিলেক্ট করে কপি করুন",
   fbCopied: "মেসেজ কপি হয়েছে — পোস্টে পেস্ট করুন",
-  challengeFriend: "বন্ধুকে চ্যালেঞ্জ করুন",
-  challengeCopied: "চ্যালেঞ্জ কপি হয়েছে — বন্ধুকে পাঠিয়ে দিন!",
   shareMessage: (pct) => `বাংলাদেশ কুইজে আমি ${bnNum(pct)}% পেয়েছি 🇧🇩 আমাকে হারাতে পারবেন?`,
   scoreMessage: (s, t, pct) =>
     `বাংলাদেশ কুইজে আমি ${bnNum(s)}/${bnNum(t)} (${bnNum(pct)}%) পেয়েছি 🇧🇩 আমাকে হারাতে পারবেন?`,
-  challengeMessage: (s, t) =>
-    `বাংলাদেশ কুইজে আমি ${bnNum(s)}/${bnNum(t)} পেয়েছি 🇧🇩 পারলে আমাকে হারিয়ে দেখান!`,
 
   cardHeadline: ["বাংলাদেশকে আপনি", "কতটা চেনেন?"],
   accuracyN: (pct) => `${bnNum(pct)}% নির্ভুল`,
   streakLabel: (n) => `টানা ${bnNum(n)}`,
   canYouBeat: "আমার স্কোর হারাতে পারবেন?",
-  download: (f) => `${f} ডাউনলোড`,
   imageFailed: "ছবি তৈরি করা যায়নি — আবার চেষ্টা করুন",
   resultMapAria: "ফলাফলের ম্যাপ",
 

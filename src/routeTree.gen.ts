@@ -13,6 +13,8 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ChallengeRouteImport } from './routes/challenge'
 import { Route as ExploreRouteImport } from './routes/explore'
 import { Route as QuizRouteImport } from './routes/quiz'
+import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ApiOgRouteImport } from './routes/api/og'
 
 const IndexRoute = IndexRouteImport.update({
@@ -35,6 +37,16 @@ const QuizRoute = QuizRouteImport.update({
   path: '/quiz',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
+  id: '/robots.txt',
+  path: '/robots.txt',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiOgRoute = ApiOgRouteImport.update({
   id: '/api/og',
   path: '/api/og',
@@ -46,6 +58,8 @@ export interface FileRoutesByFullPath {
   '/challenge': typeof ChallengeRoute
   '/explore': typeof ExploreRoute
   '/quiz': typeof QuizRoute
+  '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/api/og': typeof ApiOgRoute
 }
 export interface FileRoutesByTo {
@@ -53,6 +67,8 @@ export interface FileRoutesByTo {
   '/challenge': typeof ChallengeRoute
   '/explore': typeof ExploreRoute
   '/quiz': typeof QuizRoute
+  '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/api/og': typeof ApiOgRoute
 }
 export interface FileRoutesById {
@@ -61,14 +77,38 @@ export interface FileRoutesById {
   '/challenge': typeof ChallengeRoute
   '/explore': typeof ExploreRoute
   '/quiz': typeof QuizRoute
+  '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/api/og': typeof ApiOgRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/challenge' | '/explore' | '/quiz' | '/api/og'
+  fullPaths:
+    | '/'
+    | '/challenge'
+    | '/explore'
+    | '/quiz'
+    | '/robots.txt'
+    | '/sitemap.xml'
+    | '/api/og'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/challenge' | '/explore' | '/quiz' | '/api/og'
-  id: '__root__' | '/' | '/challenge' | '/explore' | '/quiz' | '/api/og'
+  to:
+    | '/'
+    | '/challenge'
+    | '/explore'
+    | '/quiz'
+    | '/robots.txt'
+    | '/sitemap.xml'
+    | '/api/og'
+  id:
+    | '__root__'
+    | '/'
+    | '/challenge'
+    | '/explore'
+    | '/quiz'
+    | '/robots.txt'
+    | '/sitemap.xml'
+    | '/api/og'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -76,6 +116,8 @@ export interface RootRouteChildren {
   ChallengeRoute: typeof ChallengeRoute
   ExploreRoute: typeof ExploreRoute
   QuizRoute: typeof QuizRoute
+  RobotsDottxtRoute: typeof RobotsDottxtRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ApiOgRoute: typeof ApiOgRoute
 }
 
@@ -109,6 +151,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof QuizRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/robots.txt': {
+      id: '/robots.txt'
+      path: '/robots.txt'
+      fullPath: '/robots.txt'
+      preLoaderRoute: typeof RobotsDottxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/og': {
       id: '/api/og'
       path: '/api/og'
@@ -124,6 +180,8 @@ const rootRouteChildren: RootRouteChildren = {
   ChallengeRoute: ChallengeRoute,
   ExploreRoute: ExploreRoute,
   QuizRoute: QuizRoute,
+  RobotsDottxtRoute: RobotsDottxtRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   ApiOgRoute: ApiOgRoute,
 }
 export const routeTree = rootRouteImport

@@ -1,14 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { createIsomorphicFn } from "@tanstack/react-start";
-import { getRequestUrl } from "@tanstack/react-start/server";
 import { ArrowRight, Flame, Swords } from "lucide-react";
 import { STRINGS, useLang } from "@/lib/i18n";
 import { accuracy, ogImageUrl, parseChallenge } from "@/lib/share";
-
-// Crawlers need an absolute og:image URL, so resolve the site origin on the server too.
-const getOrigin = createIsomorphicFn()
-  .server(() => getRequestUrl({ xForwardedHost: true }).origin)
-  .client(() => window.location.origin);
+import { getOrigin } from "@/lib/site";
 
 export const Route = createFileRoute("/challenge")({
   // The whole challenge lives in the URL, so no backend or database is needed.
@@ -37,7 +31,9 @@ export const Route = createFileRoute("/challenge")({
               { property: "og:image:width", content: "1200" },
               { property: "og:image:height", content: "630" },
               { property: "og:image:type", content: "image/png" },
+              { property: "og:image:alt", content: title },
               { name: "twitter:image", content: image },
+              { name: "twitter:image:alt", content: title },
             ]
           : []),
       ],

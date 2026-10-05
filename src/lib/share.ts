@@ -9,7 +9,6 @@ export type Challenge = {
   streak: number;
 };
 
-export const modeLabel = (m: Mode) => MODES.find((x) => x.id === m)?.label ?? m;
 export const accuracy = (c: Pick<Challenge, "score" | "total">) =>
   c.total ? Math.round((c.score / c.total) * 100) : 0;
 
@@ -45,17 +44,12 @@ export function challengeUrl(
   return `${origin}/challenge?${q}`;
 }
 
-export const shareMessage = (c: Challenge) =>
-  `I scored ${accuracy(c)}% on the Bangladesh Quiz 🇧🇩 Can you beat me?`;
-export const scoreMessage = (c: Challenge) =>
-  `I scored ${c.score}/${c.total} (${accuracy(c)}%) on the Bangladesh Quiz 🇧🇩 Can you beat me?`;
-
 /** Plain share-intent URLs — no SDKs or API keys. */
-export function shareLinks(c: Challenge, url: string) {
+export function shareLinks(url: string, text: string) {
   const e = encodeURIComponent;
   return {
     facebook: `https://www.facebook.com/sharer/sharer.php?u=${e(url)}`,
-    x: `https://x.com/intent/tweet?text=${e(shareMessage(c))}&url=${e(url)}`,
+    x: `https://x.com/intent/tweet?text=${e(text)}&url=${e(url)}`,
     linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${e(url)}`,
   };
 }

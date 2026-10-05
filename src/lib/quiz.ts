@@ -4,11 +4,8 @@ export type Mode = "district" | "division" | "find";
 export type Difficulty = "easy" | "medium" | "hard";
 export type Settings = { mode: Mode; difficulty: Difficulty; count: 5 | 10 | 20 };
 
-export const MODES: { id: Mode; label: string; hint: string }[] = [
-  { id: "district", label: "Identify District", hint: "Name the highlighted district" },
-  { id: "division", label: "Identify Division", hint: "Which division is it in?" },
-  { id: "find", label: "Find District", hint: "Tap it on the map" },
-];
+// Labels live in src/lib/i18n.ts
+export const MODES: { id: Mode }[] = [{ id: "district" }, { id: "division" }, { id: "find" }];
 export const DIFFICULTIES: Difficulty[] = ["easy", "medium", "hard"];
 export const COUNTS = [5, 10, 20] as const;
 export const QUESTION_SECONDS = 15;
@@ -90,13 +87,6 @@ export function buildRound(s: Settings, firstId?: string): Question[] {
 
 export const streakBonus = (s: number) => (s >= 5 ? 50 : s === 4 ? 30 : s === 3 ? 20 : s === 2 ? 10 : 0);
 export const speedBonus = (left: number) => Math.round((50 * Math.max(0, left)) / QUESTION_SECONDS);
-
-export function rating(pct: number) {
-  if (pct >= 90) return "Bangladesh Geography Expert 🇧🇩";
-  if (pct >= 70) return "Great Bangladesh Knowledge 🇧🇩";
-  if (pct >= 50) return "Keep Exploring Bangladesh!";
-  return "Time to Explore Bangladesh";
-}
 
 /* ---------- Persistence (browser only) ---------- */
 export type Stats = {

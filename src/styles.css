@@ -5,8 +5,8 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-display: "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
-  --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Bricolage Grotesque", "Hind Siliguri", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Manrope", "Hind Siliguri", ui-sans-serif, system-ui, sans-serif;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -177,4 +177,9 @@
 }
 .map-marker-incorrect {
   fill: var(--destructive-foreground);
+}
+
+/* Wide letter-spacing breaks Bangla conjuncts (unlayered so it beats the tracking utilities). */
+:lang(bn) [class*="tracking-"] {
+  letter-spacing: normal;
 }

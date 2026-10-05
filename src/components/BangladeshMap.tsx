@@ -1,6 +1,7 @@
 import { useRef, useState, type KeyboardEvent } from "react";
 import { motion } from "framer-motion";
 import { DISTRICTS, MAP_HEIGHT, MAP_WIDTH, type District } from "@/data/districts";
+import { useLang } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 export type DistrictState = "idle" | "target" | "selected" | "correct" | "incorrect" | "muted" | "division";
@@ -25,17 +26,18 @@ export function BangladeshMap({
   interactive,
   showTooltip,
   onSelect,
-  ariaLabel = "Map of Bangladesh districts",
+  ariaLabel,
   className,
 }: Props) {
   const wrap = useRef<HTMLDivElement>(null);
   const [tip, setTip] = useState<{ name: string; x: number; y: number } | null>(null);
   const focus = DISTRICTS.find((d) => d.id === focusId);
+  const { t, district } = useLang();
 
   const move = (e: React.PointerEvent, d: District) => {
     if (!showTooltip || !wrap.current) return;
     const r = wrap.current.getBoundingClientRect();
-    setTip({ name: d.name, x: e.clientX - r.left, y: e.clientY - r.top });
+    setTip({ name: district(d.name), x: e.clientX - r.left, y: e.clientY - r.top });
   };
   const key = (e: KeyboardEvent, d: District) => {
     if (e.key === "Enter" || e.key === " ") {
@@ -50,7 +52,7 @@ export function BangladeshMap({
         viewBox={`0 0 ${MAP_WIDTH} ${MAP_HEIGHT}`}
         className="mx-auto h-full max-h-[70vh] w-full"
         role={interactive ? "group" : "img"}
-        aria-label={ariaLabel}
+        aria-label={ariaLabel ?? t.siteName}
         onPointerLeave={() => setTip(null)}
       >
         {DISTRICTS.map((d) => (
@@ -62,7 +64,7 @@ export function BangladeshMap({
             data-interactive={interactive ? "true" : "false"}
             tabIndex={interactive ? 0 : -1}
             role={interactive ? "button" : undefined}
-            aria-label={interactive ? (showTooltip ? d.name : "District") : undefined}
+            aria-label={interactive ? (showTooltip ? district(d.name) : t.district) : undefined}
             onClick={interactive ? () => onSelect?.(d) : undefined}
             onKeyDown={interactive ? (e) => key(e, d) : undefined}
             onPointerMove={(e) => move(e, d)}

@@ -1,9 +1,10 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "framer-motion";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ArrowRight, Check, Copy, Flame, RotateCcw, Share2, Timer, Trophy, X } from "lucide-react";
-import { toast } from "sonner";
+import { ArrowRight, Check, Flame, RotateCcw, Timer, Trophy, X } from "lucide-react";
 import { BangladeshMap, type DistrictState } from "@/components/BangladeshMap";
+import { ResultCardPreview } from "@/components/ResultCard";
+import { ShareButtons } from "@/components/ShareButtons";
 import { DISTRICTS } from "@/data/districts";
 import {
   buildRound,
@@ -23,6 +24,7 @@ import {
   type Question,
   type Settings,
 } from "@/lib/quiz";
+import { modeLabel, type Challenge } from "@/lib/share";
 import { cn } from "@/lib/utils";
 
 type Search = { mode?: Mode; difficulty?: Difficulty; count?: number; district?: string; start?: boolean };
@@ -490,30 +492,15 @@ function Results({ result, onAgain, onSetup }: { result: Result; onAgain: () => 
     setNewBest(recordGame({ score: result.score, correct, total, bestStreak: result.bestStreak }).newBest);
   }, [result, correct, total]);
 
-  const states: Record<string, DistrictState> = {};
-  for (const a of result.answers) states[a.id] = a.correct ? "correct" : "incorrect";
-
-  const unit = result.settings.mode === "division" ? "divisions" : "districts";
-  const text = `🇧🇩 I scored ${result.score} points on Bangladesh Quiz Map and identified ${correct}/${total} ${unit} correctly!`;
-  const url = typeof window !== "undefined" ? window.location.origin : "";
-
-  const copy = async () => {
-    try {
-      await navigator.clipboard.writeText(`${text} ${url}`);
-      toast.success("Result copied");
-    } catch {
-      toast.error("Couldn't copy — try selecting the text instead");
-    }
-  };
-  const share = async () => {
-    if (navigator.share) {
-      try {
-        await navigator.share({ title: "Bangladesh Quiz Map", text, url });
-      } catch {
-        /* cancelled */
-      }
-    } else copy();
-  };
+  const states = useMemo(() => {
+    const s: Record<string, DistrictState> = {};
+    for (const a of result.answers) s[a.id] = a.correct ? "correct" : "incorrect";
+    return s;
+  }, [result]);
+  const shared = useMemo<Challenge>(
+    () => ({ ...result.settings, score: correct, total, streak: result.bestStreak }),
+    [result, correct, total],
+  );
 
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_1fr]">
@@ -522,6 +509,9 @@ function Results({ result, onAgain, onSetup }: { result: Result; onAgain: () => 
           🎉
         </motion.div>
         <p className="mt-3 text-xs font-bold uppercase tracking-[0.3em] text-muted-foreground">Quiz complete</p>
+        <p className="mt-1 text-sm text-muted-foreground capitalize">
+          {modeLabel(result.settings.mode)} · {result.settings.difficulty}
+        </p>
         <motion.p
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -552,39 +542,23 @@ function Results({ result, onAgain, onSetup }: { result: Result; onAgain: () => 
           ))}
         </dl>
 
-        <div className="mt-6 rounded-xl border bg-background/40 p-4 text-left text-sm">{text}</div>
-        <div className="mt-4 grid grid-cols-3 gap-2">
-          <button onClick={copy} className="inline-flex items-center justify-center gap-1.5 rounded-lg border bg-secondary px-3 py-2.5 text-sm font-semibold hover:bg-muted">
-            <Copy className="size-4" /> Copy
-          </button>
-          <button onClick={share} className="inline-flex items-center justify-center gap-1.5 rounded-lg border bg-secondary px-3 py-2.5 text-sm font-semibold hover:bg-muted">
-            <Share2 className="size-4" /> Share
-          </button>
-          <button onClick={onAgain} className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-primary px-3 py-2.5 text-sm font-semibold text-primary-foreground hover:opacity-90">
-            <RotateCcw className="size-4" /> Play Again
-          </button>
+        <div className="mt-6">
+          <ShareButtons result={shared} />
         </div>
+        <button
+          onClick={onAgain}
+          className="mt-3 inline-flex min-h-12 w-full items-center justify-center gap-1.5 rounded-lg bg-primary px-3 py-2.5 text-sm font-semibold text-primary-foreground hover:opacity-90"
+        >
+          <RotateCcw className="size-4" /> Play Again
+        </button>
         <div className="mt-4 flex justify-center gap-4 text-sm text-muted-foreground">
           <button onClick={onSetup} className="hover:text-foreground">Change settings</button>
           <Link to="/explore" className="hover:text-foreground">Explore districts</Link>
         </div>
       </div>
 
-      <div className="rounded-3xl border bg-card/60 p-6 shadow-card">
-        <BangladeshMap states={states} ariaLabel="Your results on the map: correct and incorrect districts marked" />
-        <dl className="mt-4 grid grid-cols-4 gap-2 text-center text-xs">
-          {[
-            [64, "districts"],
-            [total, "explored"],
-            [correct, "correct ✓"],
-            [total - correct, "incorrect ✕"],
-          ].map(([v, l]) => (
-            <div key={String(l)}>
-              <dd className="font-display text-xl font-bold">{v}</dd>
-              <dt className="text-muted-foreground">{l}</dt>
-            </div>
-          ))}
-        </dl>
+      <div className="rounded-3xl border bg-card/60 p-4 shadow-card md:p-6">
+        <ResultCardPreview result={shared} states={states} />
       </div>
     </div>
   );

@@ -92,9 +92,9 @@ export const streakBonus = (s: number) => (s >= 5 ? 50 : s === 4 ? 30 : s === 3 
 export const speedBonus = (left: number) => Math.round((50 * Math.max(0, left)) / QUESTION_SECONDS);
 
 export function rating(pct: number) {
-  if (pct >= 90) return "Bangladesh Geography Master";
-  if (pct >= 70) return "You Know Bangladesh Well";
-  if (pct >= 50) return "Getting There";
+  if (pct >= 90) return "Bangladesh Geography Expert 🇧🇩";
+  if (pct >= 70) return "Great Bangladesh Knowledge 🇧🇩";
+  if (pct >= 50) return "Keep Exploring Bangladesh!";
   return "Time to Explore Bangladesh";
 }
 
